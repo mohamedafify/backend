@@ -12,12 +12,12 @@ type User struct {
 	Password    string `json:"password"`
 }
 
-func NewUser(firstName, lastName string) *User {
+func NewUser(firstName, lastName, phoneNumber, password string) *User {
 	return &User{
 		PK:          rand.Intn(10000),
 		FirstName:   firstName,
 		LastName:    lastName,
-		PhoneNumber: "+201000000000",
-		Password:    "test12345",
+		PhoneNumber: phoneNumber,
+		Password:    password,
 	}
 }

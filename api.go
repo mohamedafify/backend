@@ -42,7 +42,7 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error {
-	user := NewUser("Mohamed", "Afify")
+	user := NewUser("Mohamed", "Afify", "+201000000000", "Password@12345")
 	return WriteJSON(w, http.StatusOK, user)
 }
 
