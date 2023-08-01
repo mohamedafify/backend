@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -6,30 +6,29 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/mohamedafify/backend/storage"
+	"github.com/mohamedafify/backend/types"
 )
 
-type APIServer struct {
+type Server struct {
 	listenAddr string
+	store      storage.Storage
 }
 
-func NewAPIServer(listenAddr string) *APIServer {
-	return &APIServer{
+func NewServer(listenAddr string, store storage.Storage) *Server {
+	return &Server{
 		listenAddr: listenAddr,
+		store:      store,
 	}
 }
 
-func (s *APIServer) Run() {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/user", makeHTTPHandleFunc(s.handleUser))
-
+func (s *Server) Start() {
+	http.HandleFunc("/user", makeHTTPHandleFunc(s.handleUser))
 	log.Println("server running on Port:", s.listenAddr)
-
-	http.ListenAndServe(s.listenAddr, router)
+	http.ListenAndServe(s.listenAddr, nil)
 }
 
-func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) handleUser(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
 	case "GET":
 		return s.handleGetUser(w, r)
@@ -41,24 +40,24 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) error {
 	return fmt.Errorf("Method not allowed %s", r.Method)
 }
 
-func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error {
-	user := NewUser("Mohamed", "Afify", "+201000000000", "Password@12345")
+func (s *Server) handleGetUser(w http.ResponseWriter, r *http.Request) error {
+	user := types.NewUser("Mohamed", "Afify", "+201000000000", "Password@12345")
 	return WriteJSON(w, http.StatusOK, user)
 }
 
-func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *APIServer) handleSignup(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) handleSignup(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
