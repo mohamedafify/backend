@@ -2,28 +2,26 @@ package main
 
 import (
 	"log"
-	"os"
+	"net/http"
 
-	"github.com/joho/godotenv"
-	"github.com/mohamedafify/backend/api"
-	"github.com/mohamedafify/backend/storage"
+	"github.com/gorilla/mux"
+	"github.com/mohamedafify/backend/db"
+	"github.com/mohamedafify/backend/handlers"
 )
 
 func main() {
-	godotenv.Load(".env")
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("PORT is not found in the enviroment variables")
-	}
-
-	store, err := storage.NewPostgresStore()
+	dbConnStr := "postgres://postgres@localhost/backend?sslmode=disable"
+	db, err := db.NewDB(dbConnStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := store.Init(); err != nil {
-		log.Fatal(err)
-	}
 
-	server := api.NewServer("localhost:"+port, store)
-	server.Start()
+	router := mux.NewRouter()
+
+	userHandler := handlers.NewUserHandler(db)
+
+	router.HandleFunc("/users", handlers.MakeHTTPHandleFunc(userHandler.Handle))
+
+	log.Println("server running on Port:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
