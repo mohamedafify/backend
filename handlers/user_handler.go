@@ -1,39 +1,33 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 
 	"github.com/mohamedafify/backend/models"
+	"github.com/mohamedafify/backend/services"
 )
 
 type UserHandler struct {
-	db *sql.DB
+	service *services.UserService
 }
 
-func NewUserHandler(db *sql.DB) *UserHandler {
-	return &UserHandler{db: db}
+func NewUserHandler(service *services.UserService) *UserHandler {
+	return &UserHandler{service: service}
 }
-
-/*
-func (uh *UserHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	makeHTTPHandleFunc(uh.handle)
-}
-*/
 
 func (uh *UserHandler) Handle(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
 	case http.MethodPost:
 		return uh.CreateUser(w, r)
 	}
-	return fmt.Errorf("%s Method is not allowed", r.Method)
+	return fmt.Errorf("%s method is not allowed", r.Method)
 }
 
 func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) error {
 
 	var req models.CreateUserRequest
-	if err := DecodeBody(r, &req); err != nil {
+	if err := GetBody(r, &req); err != nil {
 		return err
 	}
 
@@ -42,11 +36,8 @@ func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) error 
 		return err
 	}
 
-	query := `INSERT INTO users (id, firstName, LastName, email, password, phoneNumber, createdAt) VALUES ($1, $2, $3, $4, $5, $6, $7)`
-
-	_, insertErr := uh.db.Exec(query, user.ID, user.FirstName, user.LastName, user.Email, user.Password, user.PhoneNumber, user.CreatedAt)
-	if insertErr != nil {
-		return insertErr
+	if dbErr := uh.service.CreateUser(user); dbErr != nil {
+		return dbErr
 	}
 
 	return WriteJSON(w, http.StatusOK, user)

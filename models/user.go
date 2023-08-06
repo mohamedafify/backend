@@ -13,7 +13,7 @@ type User struct {
 	LastName    string    `json:"lastName"`
 	Email       string    `json:"email"`
 	PhoneNumber string    `json:"phoneNumber"`
-	Password    string    `json:"-"`
+	Password    string    `json:"password"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
@@ -22,7 +22,7 @@ type CreateUserRequest struct {
 	LastName    string `json:"lastName"`
 	Email       string `json:"email"`
 	PhoneNumber string `json:"phoneNumber"`
-	Password    string `json:"-"`
+	Password    string `json:"password"`
 }
 
 func CreateUser(firstName, lastName, phoneNumber, email, password string) (*User, error) {
